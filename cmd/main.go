@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"fmt"
+	"encoding/json"
 	"log"
 	"os"
 	"strings"
@@ -25,12 +25,15 @@ func main() {
 		line := scanner.Text()
 		stmt += " " + line
 		if strings.Contains(line, ";") {
-			fmt.Println(stmt)
 			l := lexer.New(stmt)
 			p := parser.New(l)
-			nodes = p.ParseSQL()
+			nodes = append(p.ParseSQL(), nodes...)
 			stmt = ""
 		}
 	}
-	fmt.Println(nodes)
+	// TODO
+	enc := json.NewEncoder(os.Stdout)
+	enc.SetIndent("", "    ")
+	enc.Encode(nodes)
+
 }

@@ -79,51 +79,86 @@ func (p *Parser) nextToken() {
 
 func (p *Parser) parseCreateExpression() ast.Node {
 	if !p.expectPeek(token.TABLE) {
-		fmt.Print("only allow CREATE TABLE, got", p.peekToken)
+		fmt.Println("only allow CREATE TABLE, got", p.peekToken)
 		return nil
 	}
 	node := &ast.CreateTable{
 		Token: p.curToken,
 	}
 	node.Table = p.parseTableName()
-	fmt.Println("table", node.Table)
-	// if !p.expectPeek(token.LPAREN) {
-	// 	return nil
-	// }
-	// if !p.expectPeek(token.RPAREN) {
-	// 	return nil
-	// }
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
 
+	node.Columns = p.parseColumns()
 	for {
-		if p.peekTokenIs(token.RPAREN) || p.peekTokenIs(token.EOF) {
+		p.nextToken()
+		if p.curTokenIs(token.EOF) {
 			break
 		}
-		fmt.Println("current token", p.curToken)
-		p.nextToken()
 	}
-	// TODO
-	// parse columns
-	fmt.Println(node)
 	return node
 }
 
 func (p *Parser) parseTableName() ast.TableName {
-	user := p.curToken.Literal
-	if p.expectPeek(token.STRING) {
+	if !p.expectPeek(token.STRING) {
 		return ast.TableName{}
 	}
-	if p.expectPeek(token.DOT) {
+	user := p.curToken.Literal
+	if !p.expectPeek(token.DOT) {
+		return ast.TableName{}
+	}
+	if !p.expectPeek(token.STRING) {
 		return ast.TableName{}
 	}
 	table := p.curToken.Literal
-	if p.expectPeek(token.STRING) {
-		return ast.TableName{}
-	}
-
 	return ast.TableName{
 		User:  user,
 		Table: table,
 	}
+}
+
+func (p *Parser) parseColumns() []*ast.ColumnDef {
+	columns := []*ast.ColumnDef{}
+
+	for {
+		if !p.expectPeek(token.STRING) {
+			return columns
+		}
+		cName := p.curToken.Literal
+		if _, ok := token.DataTypes[p.peekToken.Literal]; !ok {
+			p.peekError(p.peekToken.Type)
+			return columns
+		}
+		p.nextToken()
+		// add new columns
+		columns = append(columns, &ast.ColumnDef{
+			Name:    cName,
+			Type:    p.curToken,
+			Elems:   nil,
+			Options: nil,
+		})
+
+		if p.peekTokenIs(token.LPAREN) {
+			// skip to rparen
+			// log.Println("skipt to RPAREN")
+			for {
+				if p.peekTokenIs(token.RPAREN) {
+					break
+				}
+				p.nextToken()
+			}
+		}
+
+		for {
+			p.nextToken()
+			if p.curTokenIs(token.COMMA) || p.peekTokenIs(token.RPAREN) || p.peekTokenIs(token.EOF) {
+				break
+			}
+
+		}
+	}
+	return columns
 }
 
 func (p *Parser) curTokenIs(t token.TokenType) bool {

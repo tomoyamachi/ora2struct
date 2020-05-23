@@ -133,5 +133,6 @@ func isDigit(ch byte) bool {
 }
 
 func isLetter(ch byte) bool {
-	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
+	// oracle datatype contains "2" like NVARCHAR2
+	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_' || ch == '2'
 }

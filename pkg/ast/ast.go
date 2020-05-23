@@ -27,7 +27,7 @@ type TableName struct {
 
 type ColumnDef struct {
 	Name string
-	Type string
+	Type token.Token
 	// Elems is the element list for enum and set type.
 	Elems   []string
 	Options []*ColumnOption
