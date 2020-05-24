@@ -2,21 +2,35 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"log"
 	"os"
 	"strings"
 
 	"github.com/tomoyamachi/dbscheme2struct/pkg/ast"
 	"github.com/tomoyamachi/dbscheme2struct/pkg/lexer"
+	"github.com/tomoyamachi/dbscheme2struct/pkg/output"
 	"github.com/tomoyamachi/dbscheme2struct/pkg/parser"
 )
 
 func main() {
-	ddl, err := os.Open("./test/ddl/single.ddl")
+	fileName := os.Args[1]
+	nodes, err := parseFile(fileName)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	err = output.Output(nodes, "db", "")
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func parseFile(fileName string) ([]ast.Node, error) {
+	ddl, err := os.Open(fileName)
+	if err != nil {
+		return nil, err
+	}
+	defer ddl.Close()
 
 	var nodes []ast.Node
 	scanner := bufio.NewScanner(ddl)
@@ -31,9 +45,5 @@ func main() {
 			stmt = ""
 		}
 	}
-	// TODO
-	enc := json.NewEncoder(os.Stdout)
-	enc.SetIndent("", "    ")
-	enc.Encode(nodes)
-
+	return nodes, nil
 }

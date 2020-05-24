@@ -126,7 +126,7 @@ func (p *Parser) parseColumns() []*ast.ColumnDef {
 			return columns
 		}
 		cName := p.curToken.Literal
-		if _, ok := token.DataTypes[p.peekToken.Literal]; !ok {
+		if _, ok := token.DataTypesGoType[p.peekToken.Literal]; !ok {
 			p.peekError(p.peekToken.Type)
 			return columns
 		}

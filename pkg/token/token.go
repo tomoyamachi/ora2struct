@@ -58,17 +58,9 @@ type Token struct {
 	Literal string
 }
 
-var gostructtype = []string{
-	"string",
-	"int",
-	"[]byte",
-	"time.Time",
-}
-
 var keywords = map[string]TokenType{
-	"CREATE": CREATE,
-	"TABLE":  TABLE,
-
+	CREATE:        CREATE,
+	TABLE:         TABLE,
 	VARCHAR2:      VARCHAR2,
 	NVARCHAR2:     NVARCHAR2,
 	NUMBER:        NUMBER,
@@ -89,25 +81,25 @@ var keywords = map[string]TokenType{
 	BFILE:         BFILE,
 }
 
-var DataTypes = map[string]struct{}{
-	VARCHAR2:      {},
-	NVARCHAR2:     {},
-	NUMBER:        {},
-	FLOAT:         {},
-	LONG:          {},
-	DATE:          {},
-	BINARY_FLOAT:  {},
-	BINARY_DOUBLE: {},
-	TIMESTAMP:     {},
-	RAW:           {},
-	ROWID:         {},
-	UROWID:        {},
-	CHAR:          {},
-	NCHAR:         {},
-	CLOB:          {},
-	NCLOB:         {},
-	BLOB:          {},
-	BFILE:         {},
+var DataTypesGoType = map[string]string{
+	VARCHAR2:      "string",
+	NVARCHAR2:     "string",
+	NUMBER:        "int",
+	FLOAT:         "float32",
+	LONG:          "string",
+	DATE:          "time.Time",
+	BINARY_FLOAT:  "[]byte",
+	BINARY_DOUBLE: "[]byte",
+	TIMESTAMP:     "int",
+	RAW:           "[]byte",
+	ROWID:         "string",
+	UROWID:        "string",
+	CHAR:          "string",
+	NCHAR:         "string",
+	CLOB:          "[]byte",
+	NCLOB:         "[]byte",
+	BLOB:          "[]byte",
+	BFILE:         "[]byte",
 }
 
 func LookupIdent(ident string) TokenType {
