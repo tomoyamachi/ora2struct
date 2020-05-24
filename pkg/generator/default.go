@@ -1,4 +1,4 @@
-package output
+package generator
 
 const simpleStruct = `
 package {{.Package}}

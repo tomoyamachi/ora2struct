@@ -1,9 +1,9 @@
-package output
+package generator
 
 import (
+	"io"
 	"io/ioutil"
 	"log"
-	"os"
 	"strings"
 	"text/template"
 
@@ -16,7 +16,7 @@ type tplData struct {
 	Nodes   []ast.Node
 }
 
-func Output(nodes []ast.Node, pkgName, tplFile string) (err error) {
+func Output(writer io.Writer, nodes []ast.Node, pkgName, tplFile string) (err error) {
 	var tplSource string
 	if tplFile == "" {
 		tplSource = simpleStruct
@@ -31,7 +31,7 @@ func Output(nodes []ast.Node, pkgName, tplFile string) (err error) {
 	if err != nil {
 		return err
 	}
-	return tpl.Execute(os.Stdout, tplData{Nodes: nodes, Package: pkgName})
+	return tpl.Execute(writer, tplData{Nodes: nodes, Package: pkgName})
 }
 
 func loadFileStr(filename string) (string, error) {
