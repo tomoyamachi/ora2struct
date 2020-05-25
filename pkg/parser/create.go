@@ -80,16 +80,18 @@ func (p *Parser) parseColumns() []*ast.ColumnDef {
 		// some columns need bracket options, like VARCHAR2(30)
 		if p.peekTokenIs(token.LPAREN) {
 			for {
+				p.nextToken()
 				if p.peekTokenIs(token.RPAREN) {
+					p.nextToken()
 					break
 				}
-				p.nextToken()
 			}
 		}
 
 		col.Options = p.parseColumnOpts()
 		columns = append(columns, col)
 		for {
+			// skip to last of a column definition
 			p.nextToken()
 			if p.curTokenIs(token.COMMA) || p.peekTokenIs(token.RPAREN) || p.peekTokenIs(token.EOF) {
 				break
@@ -106,15 +108,15 @@ func (p *Parser) parseColumnOpts() []*ast.ColumnOption {
 		if p.peekTokenIs(token.COMMA) || p.peekTokenIs(token.RPAREN) {
 			return opts
 		}
-		switch p.peekToken.Type {
+		switch p.curToken.Type {
 		case token.NOT:
-			p.nextToken()
-			if p.expectPeek(token.NULL) {
+			if p.peekTokenIs(token.NULL) {
 				opts = append(opts, &ast.ColumnOption{
 					Type: ast.ColumnOptionNotNull,
 				})
 			}
 		}
+		p.nextToken()
 	}
 	return opts
 }

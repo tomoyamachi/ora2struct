@@ -76,8 +76,18 @@ type Token struct {
 }
 
 var keywords = map[string]TokenType{
-	CREATE:        CREATE,
-	TABLE:         TABLE,
+	CREATE:      CREATE,
+	TABLE:       TABLE,
+	NOT:         NOT,
+	NULL:        NULL,
+	FUNCTION:    FUNCTION,
+	OR:          OR,
+	REPLACE:     REPLACE,
+	EDITIONABLE: EDITIONABLE,
+	VIEW:        VIEW,
+	DEFAULT:     DEFAULT,
+
+	// datatypes
 	VARCHAR2:      VARCHAR2,
 	NVARCHAR2:     NVARCHAR2,
 	NUMBER:        NUMBER,
