@@ -1,5 +1,7 @@
 package token
 
+import "strings"
+
 const (
 	ILLEGAL = "ILLEGAL"
 	EOF     = "EOF"
@@ -106,6 +108,13 @@ var keywords = map[string]TokenType{
 	NCLOB:         NCLOB,
 	BLOB:          BLOB,
 	BFILE:         BFILE,
+}
+
+// keywords can use lowercase
+func init() {
+	for k, v := range keywords {
+		keywords[strings.ToLower(k)] = v
+	}
 }
 
 func LookupIdent(ident string) TokenType {
