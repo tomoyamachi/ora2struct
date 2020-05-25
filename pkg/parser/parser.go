@@ -40,7 +40,7 @@ func New(l *lexer.Lexer) *Parser {
 	return p
 }
 
-func (p *Parser) ParseSQL() []ast.Node {
+func (p *Parser) ParseSQL(debug bool) []ast.Node {
 	nodes := []ast.Node{}
 
 	for p.curToken.Type != token.EOF {
@@ -50,14 +50,18 @@ func (p *Parser) ParseSQL() []ast.Node {
 		}
 		p.nextToken()
 	}
-	log.Print(p.errors)
+	if debug {
+		for _, e := range p.errors {
+			log.Print(e)
+		}
+	}
 	return nodes
 }
 
 func (p *Parser) parseNode() ast.Node {
 	prefix := p.prefixParseFns[p.curToken.Type]
 	if prefix == nil {
-		p.noPrefixParseFnError(p.curToken.Type)
+		// p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
 	leftExp := prefix()

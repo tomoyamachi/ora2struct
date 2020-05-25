@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/tomoyamachi/dbscheme2struct/pkg/ast"
 	"github.com/tomoyamachi/dbscheme2struct/pkg/token"
 )
@@ -13,7 +15,7 @@ func (p *Parser) parseCreateExpression() ast.Node {
 		p.errors = append(p.errors, "CREATE VIEW will support, but currently not")
 		return nil
 	}
-	p.errors = append(p.errors, "CREATE %s is not support", p.peekToken.Literal)
+	p.errors = append(p.errors, fmt.Sprintf("CREATE %s is not support", p.peekToken.Literal))
 	return nil
 }
 
@@ -30,7 +32,7 @@ func (p *Parser) parseCreateTable() ast.Node {
 	node.Columns = p.parseColumns()
 	for {
 		p.nextToken()
-		if p.curTokenIs(token.EOF) {
+		if p.curTokenIs(token.EOF) || p.curTokenIs(token.RPAREN) || p.curTokenIs(token.SEMICOLON) {
 			break
 		}
 	}
@@ -57,7 +59,6 @@ func (p *Parser) parseTableName() ast.TableName {
 
 func (p *Parser) parseColumns() []*ast.ColumnDef {
 	columns := []*ast.ColumnDef{}
-
 	for {
 		if !p.expectPeeks(token.STRING, token.IDENT) {
 			return columns

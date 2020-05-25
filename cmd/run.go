@@ -13,6 +13,8 @@ import (
 	"github.com/tomoyamachi/dbscheme2struct/pkg/parser"
 )
 
+var conf *Config
+
 func NewApp(version string) *cli.App {
 	cli.AppHelpTemplate = `NAME:
   {{.Name}}{{if .Usage}} - {{.Usage}}{{end}}
@@ -51,13 +53,14 @@ func run(ctx *cli.Context) error {
 		return fmt.Errorf("argument length should 1 but got %d", ctx.Args().Len())
 	}
 
+	conf = LoadConf(ctx)
+
 	fileName := ctx.Args().First()
 	nodes, err := parseFile(fileName)
 	if err != nil {
 		return fmt.Errorf("parseFile : %w", err)
 	}
 
-	conf := LoadConf(ctx)
 	output := os.Stdout
 	if conf.OutputFile != "" {
 		if output, err = os.Create(conf.OutputFile); err != nil {
@@ -87,6 +90,6 @@ func parseFile(fileName string) ([]ast.Node, error) {
 	}
 	l := lexer.New(stmt)
 	p := parser.New(l)
-	nodes = p.ParseSQL()
+	nodes = p.ParseSQL(conf.Debug)
 	return nodes, nil
 }

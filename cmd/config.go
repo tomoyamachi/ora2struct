@@ -21,8 +21,9 @@ var (
 		Usage:   "export package name",
 	}
 	debugFlag = cli.BoolFlag{
-		Name:  "debug, d",
-		Usage: "debug mode",
+		Name:    "debug",
+		Aliases: []string{"d"},
+		Usage:   "debug mode",
 	}
 )
 
@@ -33,8 +34,8 @@ type Config struct {
 	Debug        bool
 }
 
-func LoadConf(c *cli.Context) Config {
-	return Config{
+func LoadConf(c *cli.Context) *Config {
+	return &Config{
 		TemplateFile: c.String("template"),
 		OutputFile:   c.String("output"),
 		PackageName:  c.String("package"),
