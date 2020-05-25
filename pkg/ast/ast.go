@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"github.com/tomoyamachi/dbscheme2struct/pkg/token"
+	"github.com/tomoyamachi/ora2struct/pkg/token"
 )
 
 type Node interface{}

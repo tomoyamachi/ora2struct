@@ -8,7 +8,7 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/tomoyamachi/dbscheme2struct/pkg/ast"
+	"github.com/tomoyamachi/ora2struct/pkg/ast"
 )
 
 type tplData struct {

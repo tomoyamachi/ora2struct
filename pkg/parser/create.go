@@ -3,8 +3,8 @@ package parser
 import (
 	"fmt"
 
-	"github.com/tomoyamachi/dbscheme2struct/pkg/ast"
-	"github.com/tomoyamachi/dbscheme2struct/pkg/token"
+	"github.com/tomoyamachi/ora2struct/pkg/ast"
+	"github.com/tomoyamachi/ora2struct/pkg/token"
 )
 
 func (p *Parser) parseCreateExpression() ast.Node {

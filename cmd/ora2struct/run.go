@@ -3,15 +3,14 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/tomoyamachi/dbscheme2struct/pkg/ast"
-	"github.com/tomoyamachi/dbscheme2struct/pkg/generator"
-	"github.com/tomoyamachi/dbscheme2struct/pkg/lexer"
-	"github.com/tomoyamachi/dbscheme2struct/pkg/parser"
+	"github.com/tomoyamachi/ora2struct/pkg/ast"
+	"github.com/tomoyamachi/ora2struct/pkg/generator"
+	"github.com/tomoyamachi/ora2struct/pkg/lexer"
+	"github.com/tomoyamachi/ora2struct/pkg/parser"
 )
 
 var conf *Config
@@ -81,9 +80,6 @@ func parseFile(fileName string, debug bool) ([]ast.Node, error) {
 		return nil, err
 	}
 	defer ddl.Close()
-
-	log.Print(ddl.Name())
-
 	var nodes []ast.Node
 	scanner := bufio.NewScanner(ddl)
 	stmt := ""

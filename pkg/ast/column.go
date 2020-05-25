@@ -3,7 +3,7 @@ package ast
 import (
 	"fmt"
 
-	"github.com/tomoyamachi/dbscheme2struct/pkg/token"
+	"github.com/tomoyamachi/ora2struct/pkg/token"
 )
 
 type ColumnDef struct {

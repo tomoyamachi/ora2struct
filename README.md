@@ -1,4 +1,4 @@
-# dbscheme2struct
+# ora2struct
 
 a DDL file of Oracle Database convert to go struct suited [jmoiron/sqlx](https://github.com/jmoiron/sqlx).
 

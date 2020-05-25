@@ -1,6 +1,6 @@
 package lexer
 
-import "github.com/tomoyamachi/dbscheme2struct/pkg/token"
+import "github.com/tomoyamachi/ora2struct/pkg/token"
 
 type Lexer struct {
 	input        string
