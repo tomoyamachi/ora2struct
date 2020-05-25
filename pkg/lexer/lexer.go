@@ -32,7 +32,6 @@ func (l *Lexer) NextToken() token.Token {
 
 	switch l.ch {
 	case '"', '\'':
-
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
 	case '.':
