@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/tomoyamachi/dbscheme2struct/pkg/ast"
 	"github.com/tomoyamachi/dbscheme2struct/pkg/lexer"
@@ -49,6 +50,7 @@ func (p *Parser) ParseSQL() []ast.Node {
 		}
 		p.nextToken()
 	}
+	log.Print(p.errors)
 	return nodes
 }
 
@@ -77,90 +79,6 @@ func (p *Parser) nextToken() {
 	p.peekToken = p.l.NextToken()
 }
 
-func (p *Parser) parseCreateExpression() ast.Node {
-	if !p.expectPeek(token.TABLE) {
-		fmt.Println("only allow CREATE TABLE, got", p.peekToken)
-		return nil
-	}
-	node := &ast.CreateTable{
-		Token: p.curToken,
-	}
-	node.Table = p.parseTableName()
-	if !p.expectPeek(token.LPAREN) {
-		return nil
-	}
-
-	node.Columns = p.parseColumns()
-	for {
-		p.nextToken()
-		if p.curTokenIs(token.EOF) {
-			break
-		}
-	}
-	return node
-}
-
-func (p *Parser) parseTableName() ast.TableName {
-	if !p.expectPeek(token.STRING) {
-		return ast.TableName{}
-	}
-	user := p.curToken.Literal
-	if !p.expectPeek(token.DOT) {
-		return ast.TableName{}
-	}
-	if !p.expectPeek(token.STRING) {
-		return ast.TableName{}
-	}
-	table := p.curToken.Literal
-	return ast.TableName{
-		User:  user,
-		Table: table,
-	}
-}
-
-func (p *Parser) parseColumns() []*ast.ColumnDef {
-	columns := []*ast.ColumnDef{}
-
-	for {
-		if !p.expectPeek(token.STRING) {
-			return columns
-		}
-		cName := p.curToken.Literal
-		if _, ok := token.DataTypesGoType[p.peekToken.Literal]; !ok {
-			p.peekError(p.peekToken.Type)
-			return columns
-		}
-		p.nextToken()
-		// add new columns
-		columns = append(columns, &ast.ColumnDef{
-			Name:    cName,
-			Type:    p.curToken,
-			Elems:   nil,
-			Options: nil,
-		})
-
-		if p.peekTokenIs(token.LPAREN) {
-			// skip to rparen
-			// log.Println("skipt to RPAREN")
-			for {
-				if p.peekTokenIs(token.RPAREN) {
-					break
-				}
-				p.nextToken()
-			}
-		}
-
-		for {
-			p.nextToken()
-			if p.curTokenIs(token.COMMA) || p.peekTokenIs(token.RPAREN) || p.peekTokenIs(token.EOF) {
-				break
-			}
-
-		}
-	}
-	return columns
-}
-
 func (p *Parser) curTokenIs(t token.TokenType) bool {
 	return p.curToken.Type == t
 }
@@ -179,8 +97,19 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 	return false
 }
 
-func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, p.peekToken.Type)
+func (p *Parser) expectPeeks(ts ...token.TokenType) bool {
+	for _, t := range ts {
+		if p.peekTokenIs(t) {
+			p.nextToken()
+			return true
+		}
+	}
+	p.peekError(ts...)
+	return false
+}
+
+func (p *Parser) peekError(ts ...token.TokenType) {
+	msg := fmt.Sprintf("expected next token to be %v, got %s instead", ts, p.peekToken.Type)
 	p.errors = append(p.errors, msg)
 }
 

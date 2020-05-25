@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/urfave/cli/v2"
 
@@ -67,7 +66,7 @@ func run(ctx *cli.Context) error {
 	}
 
 	if err = generator.Output(output, nodes, conf.PackageName, conf.TemplateFile); err != nil {
-		fmt.Println("output :%w", err)
+		return fmt.Errorf("output :%w", err)
 	}
 	return nil
 }
@@ -85,12 +84,9 @@ func parseFile(fileName string) ([]ast.Node, error) {
 	for scanner.Scan() {
 		line := scanner.Text()
 		stmt += " " + line
-		if strings.Contains(line, ";") {
-			l := lexer.New(stmt)
-			p := parser.New(l)
-			nodes = append(p.ParseSQL(), nodes...)
-			stmt = ""
-		}
 	}
+	l := lexer.New(stmt)
+	p := parser.New(l)
+	nodes = p.ParseSQL()
 	return nodes, nil
 }

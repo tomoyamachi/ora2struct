@@ -47,9 +47,26 @@ const (
 	// INTERVAL_DAY
 	// LONG_RAW
 
-	CREATE = "CREATE"
-	TABLE  = "TABLE"
+	CREATE      = "CREATE"
+	TABLE       = "TABLE"
+	FUNCTION    = "FUNCTION"
+	OR          = "OR"
+	REPLACE     = "REPLACE"
+	EDITIONABLE = "EDITIONABLE"
+	VIEW        = "VIEW"
+	NOT         = "NOT"
+	NULL        = "NULL"
+	DEFAULT     = "DEFAULT"
 )
+
+var combinations = [][]string{
+	{CREATE, TABLE},
+	{CREATE, FUNCTION},
+	{CREATE, VIEW},
+	{CREATE, OR, REPLACE, VIEW},
+	{CREATE, OR, REPLACE, EDITIONABLE, VIEW},
+	{NOT, NULL},
+}
 
 type TokenType string
 
@@ -79,27 +96,6 @@ var keywords = map[string]TokenType{
 	NCLOB:         NCLOB,
 	BLOB:          BLOB,
 	BFILE:         BFILE,
-}
-
-var DataTypesGoType = map[string]string{
-	VARCHAR2:      "string",
-	NVARCHAR2:     "string",
-	NUMBER:        "int",
-	FLOAT:         "float32",
-	LONG:          "string",
-	DATE:          "time.Time",
-	BINARY_FLOAT:  "[]byte",
-	BINARY_DOUBLE: "[]byte",
-	TIMESTAMP:     "int",
-	RAW:           "[]byte",
-	ROWID:         "string",
-	UROWID:        "string",
-	CHAR:          "string",
-	NCHAR:         "string",
-	CLOB:          "[]byte",
-	NCLOB:         "[]byte",
-	BLOB:          "[]byte",
-	BFILE:         "[]byte",
 }
 
 func LookupIdent(ident string) TokenType {

@@ -31,11 +31,6 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 
 	switch l.ch {
-	case 'c':
-	case 'C':
-		tok.Literal = l.readIdentifier()
-		tok.Type = token.LookupIdent(tok.Literal)
-		return tok
 	case '"':
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
@@ -82,7 +77,6 @@ func (l *Lexer) peekChar() byte {
 	if l.readPosition >= len(l.input) {
 		return 0
 	}
-
 	return l.input[l.readPosition]
 }
 
