@@ -31,7 +31,7 @@ type OutputView struct {
 type ColumnParam struct {
 	Name   string
 	Type   string
-	Import string
+	Origin string
 }
 
 func Output(writer io.Writer, nodes []ast.Node, pkgName, tplFile string) (err error) {
@@ -89,8 +89,9 @@ func convertTable(t *ast.CreateTable) (imports []string, ot *OutputTable, err er
 			return nil, nil, fmt.Errorf("get gotype %s.%s: %w", t.Table.Table, col.Name, err)
 		}
 		cols = append(cols, ColumnParam{
-			Name: col.Name,
-			Type: gotype.Type,
+			Name:   col.Name,
+			Type:   gotype.Type,
+			Origin: col.Type.Literal,
 		})
 		imports = append(imports, gotype.Imports...)
 	}

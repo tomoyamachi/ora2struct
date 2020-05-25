@@ -5,6 +5,7 @@ CREATE TABLE "SCOTT"."EMP"
       "JOB" VARCHAR2(9),
       "MGR" NUMBER(4,0),
       "HIREDATE" DATE,
+      "HIREDATEN" DATE NOT NULL,
       "SAL" NUMBER(7,2),
       "COMM" NUMBER(7,2),
       "DEPTNO" NUMBER(2,0),
