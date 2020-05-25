@@ -116,5 +116,5 @@ func (p *Parser) parseColumnOpts() []*ast.ColumnOption {
 			}
 		}
 	}
-	return nil
+	return opts
 }
