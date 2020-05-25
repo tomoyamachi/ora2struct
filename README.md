@@ -28,6 +28,24 @@ type Emp struct {
 }
 ```
 
+with Docker
+
+```
+$ ls .
+sample.ddl
+
+$ docker run --rm -v "$(pwd):/app" tomoyamachi/ora2struct /app/sample.ddl
+$ ls .
+models.go sample.ddl
+
+$ cat models.go
+package models
+
+import (
+        "database/sql"
+...
+```
+
 ### Options
 
 ```
