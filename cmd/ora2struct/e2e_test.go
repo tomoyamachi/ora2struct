@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/tomoyamachi/dbscheme2struct/pkg/generator"
+	"github.com/tomoyamachi/ora2struct/pkg/generator"
 )
 
 func TestE2E(t *testing.T) {

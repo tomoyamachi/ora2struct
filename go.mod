@@ -1,4 +1,4 @@
-module github.com/tomoyamachi/dbscheme2struct
+module github.com/tomoyamachi/ora2struct
 
 go 1.14
 
