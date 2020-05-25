@@ -34,19 +34,13 @@ type ColumnOption struct {
 // ColumnOptionType is the type for ColumnOption.
 type ColumnOptionType int
 
-const (
-	ColumnOptionNoOption ColumnOptionType = iota
-	ColumnOptionNotNull
-	ColumnOptionNull
-)
-
 // ConstraintType is the type for Constraint.
 type ConstraintType int
 
-// TODO: support Foreign key
+// options
 const (
-	ConstraintNoConstraint ConstraintType = iota
-	ConstraintForeignKey
+	ColumnOptionNotNull  ColumnOptionType = iota
+	ConstraintForeignKey ConstraintType   = iota
 )
 
 // Constraint is constraint for table definition.

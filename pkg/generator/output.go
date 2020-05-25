@@ -13,8 +13,8 @@ import (
 
 type tplData struct {
 	Package string
-	Tables  []OutputTable
-	Views   []OutputView
+	Tables  []*OutputTable
+	Views   []*OutputView
 	Imports []string
 }
 
@@ -31,7 +31,7 @@ type OutputView struct {
 type ColumnParam struct {
 	Name   string
 	Type   string
-	Import string
+	Origin string
 }
 
 func Output(writer io.Writer, nodes []ast.Node, pkgName, tplFile string) (err error) {
@@ -56,28 +56,17 @@ func Output(writer io.Writer, nodes []ast.Node, pkgName, tplFile string) (err er
 
 func convertOutputTpl(nodes []ast.Node) (tplData, error) {
 	imports := []string{}
-	tables := []OutputTable{}
-	views := []OutputView{}
+	tables := []*OutputTable{}
+	views := []*OutputView{}
 	for _, node := range nodes {
 		switch node.(type) {
 		case *ast.CreateTable:
-			cols := []ColumnParam{}
-			t := node.(*ast.CreateTable)
-			for _, col := range t.Columns {
-				gotype, err := col.GetGoType()
-				if err != nil {
-					return tplData{}, fmt.Errorf("get gotype %s.%s: %w", t.Table.Table, col.Name, err)
-				}
-				cols = append(cols, ColumnParam{
-					Name: col.Name,
-					Type: gotype.Type,
-				})
-				imports = append(imports, gotype.Imports...)
+			impt, tbl, err := convertTable(node.(*ast.CreateTable))
+			if err != nil {
+				return tplData{}, fmt.Errorf("convertTable :%w", err)
 			}
-			tables = append(tables, OutputTable{
-				Table:   t.Table,
-				Columns: cols,
-			})
+			imports = append(imports, impt...)
+			tables = append(tables, tbl)
 		case *ast.CreateView:
 			log.Println("view")
 		default:
@@ -89,6 +78,24 @@ func convertOutputTpl(nodes []ast.Node) (tplData, error) {
 		Views:   views,
 		Imports: unique(imports),
 	}, nil
+}
+
+func convertTable(t *ast.CreateTable) (imports []string, ot *OutputTable, err error) {
+	imports = []string{}
+	cols := []ColumnParam{}
+	for _, col := range t.Columns {
+		gotype, err := col.GetGoType()
+		if err != nil {
+			return nil, nil, fmt.Errorf("get gotype %s.%s: %w", t.Table.Table, col.Name, err)
+		}
+		cols = append(cols, ColumnParam{
+			Name:   col.Name,
+			Type:   gotype.Type,
+			Origin: col.Type.Literal,
+		})
+		imports = append(imports, gotype.Imports...)
+	}
+	return imports, &OutputTable{Table: t.Table, Columns: cols}, nil
 }
 
 func loadFileStr(filename string) (string, error) {

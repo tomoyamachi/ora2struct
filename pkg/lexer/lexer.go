@@ -31,7 +31,7 @@ func (l *Lexer) NextToken() token.Token {
 	l.skipWhitespace()
 
 	switch l.ch {
-	case '"':
+	case '"', '\'':
 		tok.Type = token.STRING
 		tok.Literal = l.readString()
 	case '.':
@@ -52,17 +52,19 @@ func (l *Lexer) NextToken() token.Token {
 		tok = newToken(token.RBRAKET, l.ch)
 	case ':':
 		tok = newToken(token.COLON, l.ch)
+	case ';':
+		tok = newToken(token.SEMICOLON, l.ch)
 	case 0:
 		tok.Literal = ""
 		tok.Type = token.EOF
 	default:
-		if isLetter(l.ch) {
-			tok.Literal = l.readIdentifier()
-			tok.Type = token.LookupIdent(tok.Literal)
-			return tok
-		} else if isDigit(l.ch) {
+		if isDigit(l.ch) {
 			tok.Type = token.INT
 			tok.Literal = l.readNumber()
+			return tok
+		} else if isLetter(l.ch) {
+			tok.Literal = l.readIdentifier()
+			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
 		} else {
 			tok = newToken(token.ILLEGAL, l.ch)
@@ -107,7 +109,7 @@ func (l *Lexer) readString() string {
 	position := l.position + 1
 	for {
 		l.readChar()
-		if l.ch == '"' {
+		if l.ch == '"' || l.ch == '\'' {
 			break
 		}
 	}
@@ -127,6 +129,6 @@ func isDigit(ch byte) bool {
 }
 
 func isLetter(ch byte) bool {
-	// oracle datatype contains "2" like NVARCHAR2
-	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_' || ch == '2'
+	// ident can use integer some fields contains number: i.g. TEST1JI
+	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_' || '0' <= ch && ch <= '9'
 }

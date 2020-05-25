@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/urfave/cli/v2"
@@ -56,7 +57,7 @@ func run(ctx *cli.Context) error {
 	conf = LoadConf(ctx)
 
 	fileName := ctx.Args().First()
-	nodes, err := parseFile(fileName)
+	nodes, err := parseFile(fileName, conf.Debug)
 	if err != nil {
 		return fmt.Errorf("parseFile : %w", err)
 	}
@@ -74,12 +75,14 @@ func run(ctx *cli.Context) error {
 	return nil
 }
 
-func parseFile(fileName string) ([]ast.Node, error) {
+func parseFile(fileName string, debug bool) ([]ast.Node, error) {
 	ddl, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
 	}
 	defer ddl.Close()
+
+	log.Print(ddl.Name())
 
 	var nodes []ast.Node
 	scanner := bufio.NewScanner(ddl)
@@ -90,6 +93,6 @@ func parseFile(fileName string) ([]ast.Node, error) {
 	}
 	l := lexer.New(stmt)
 	p := parser.New(l)
-	nodes = p.ParseSQL(conf.Debug)
+	nodes = p.ParseSQL(debug)
 	return nodes, nil
 }
