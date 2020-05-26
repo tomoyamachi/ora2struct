@@ -1,42 +1,87 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/tomoyamachi/ora2struct/pkg/ast"
 	"github.com/tomoyamachi/ora2struct/pkg/token"
 )
 
-func (p *Parser) parseCreateExpression() ast.Node {
-	switch p.peekToken.Type {
-	case token.TABLE:
-		return p.parseCreateTable()
-	case token.VIEW:
-		p.errors = append(p.errors, "CREATE VIEW will support, but currently not")
-		return nil
+func (p *Parser) parseCreateExpression() ast.Ddl {
+	for {
+		switch p.peekToken.Type {
+		case token.TABLE:
+			return p.parseCreateTable()
+		case token.VIEW:
+			return p.parseCreateView()
+		case token.FUNCTION:
+			p.errors = append(p.errors, "unsupport CREATE FUNCTION")
+			return nil
+		case token.SEMICOLON, token.EOF:
+			p.errors = append(p.errors, "CREATE statement found, but not found resource")
+			return nil
+		default:
+			p.nextToken()
+		}
 	}
-	p.errors = append(p.errors, fmt.Sprintf("CREATE %s is not support", p.peekToken.Literal))
-	return nil
 }
 
-func (p *Parser) parseCreateTable() ast.Node {
+func (p *Parser) parseCreateView() ast.Ddl {
 	p.nextToken()
-	node := &ast.CreateTable{
+	ddl := &ast.CreateView{
 		Token: p.curToken,
 	}
-	node.Table = p.parseTableName()
+	ddl.Table = p.parseTableName()
+	if !p.expectPeek(token.LPAREN) {
+		return nil
+	}
+	ddl.Columns = p.parseViewColumns()
+	return ddl
+}
+
+func (p *Parser) parseViewColumns() []*ast.ColumnDef {
+	columns := []*ast.ColumnDef{}
+	for {
+		if !p.peekTokensAre(token.STRING, token.IDENT) {
+			return columns
+		}
+		cName := p.peekToken.Literal
+		col := &ast.ColumnDef{
+			Name: cName,
+			Type: token.Token{
+				Type:    "interface{}",
+				Literal: p.peekToken.Literal,
+			},
+		}
+		columns = append(columns, col)
+		for {
+			p.nextToken()
+			if p.curTokenIs(token.COMMA) {
+				break
+			}
+			if p.curTokensAre(token.RPAREN, token.EOF) {
+				return columns
+			}
+		}
+	}
+}
+
+func (p *Parser) parseCreateTable() ast.Ddl {
+	p.nextToken()
+	ddl := &ast.CreateTable{
+		Token: p.curToken,
+	}
+	ddl.Table = p.parseTableName()
 	if !p.expectPeek(token.LPAREN) {
 		return nil
 	}
 
-	node.Columns = p.parseColumns()
+	ddl.Columns = p.parseTableColumns()
 	for {
 		p.nextToken()
 		if p.curTokenIs(token.EOF) || p.curTokenIs(token.RPAREN) || p.curTokenIs(token.SEMICOLON) {
 			break
 		}
 	}
-	return node
+	return ddl
 }
 
 func (p *Parser) parseTableName() ast.TableName {
@@ -57,7 +102,7 @@ func (p *Parser) parseTableName() ast.TableName {
 	}
 }
 
-func (p *Parser) parseColumns() []*ast.ColumnDef {
+func (p *Parser) parseTableColumns() []*ast.ColumnDef {
 	columns := []*ast.ColumnDef{}
 	for {
 		if !p.expectPeeks(token.STRING, token.IDENT) {

@@ -74,13 +74,13 @@ func run(ctx *cli.Context) error {
 	return nil
 }
 
-func parseFile(fileName string, debug bool) ([]ast.Node, error) {
+func parseFile(fileName string, debug bool) ([]ast.Ddl, error) {
 	ddl, err := os.Open(fileName)
 	if err != nil {
 		return nil, err
 	}
 	defer ddl.Close()
-	var nodes []ast.Node
+	var nodes []ast.Ddl
 	scanner := bufio.NewScanner(ddl)
 	stmt := ""
 	for scanner.Scan() {

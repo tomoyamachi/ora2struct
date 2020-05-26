@@ -58,12 +58,8 @@ import (
 
 ## Exporting tables and views from a Oracle Database
 
+check http://www.orafaq.com/wiki/Datapump
+
 ```sql
-select
-type,owner,table_name,listagg(PRIVILEGE, ',') within group (order by PRIVILEGE) as PRIVILEGEs
-from dba_tab_privs
-where grantee = 'xxx'
-and TYPE not in ('SEQUENCE')
-group by type, owner, table_name
-order by type,owner,table_name;
+$ expdp scott/tiger DIRECTORY=dmpdir DUMPFILE=scott.dmp
 ```
