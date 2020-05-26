@@ -10,8 +10,8 @@ import (
 )
 
 type (
-	prefixParseFn func() ast.Node
-	infixParseFn  func(node ast.Node) ast.Node
+	prefixParseFn func() ast.Ddl
+	infixParseFn  func(node ast.Ddl) ast.Ddl
 )
 
 type Parser struct {
@@ -40,8 +40,8 @@ func New(l *lexer.Lexer) *Parser {
 	return p
 }
 
-func (p *Parser) ParseSQL(debug bool) []ast.Node {
-	nodes := []ast.Node{}
+func (p *Parser) ParseSQL(debug bool) []ast.Ddl {
+	nodes := []ast.Ddl{}
 
 	for p.curToken.Type != token.EOF {
 		node := p.parseNode()
@@ -52,13 +52,13 @@ func (p *Parser) ParseSQL(debug bool) []ast.Node {
 	}
 	if debug {
 		for _, e := range p.errors {
-			log.Print(e)
+			log.Println(e)
 		}
 	}
 	return nodes
 }
 
-func (p *Parser) parseNode() ast.Node {
+func (p *Parser) parseNode() ast.Ddl {
 	prefix := p.prefixParseFns[p.curToken.Type]
 	if prefix == nil {
 		// p.noPrefixParseFnError(p.curToken.Type)
@@ -87,8 +87,26 @@ func (p *Parser) curTokenIs(t token.TokenType) bool {
 	return p.curToken.Type == t
 }
 
+func (p *Parser) curTokensAre(ts ...token.TokenType) bool {
+	for _, t := range ts {
+		if p.curToken.Type == t {
+			return true
+		}
+	}
+	return false
+}
+
 func (p *Parser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
+}
+
+func (p *Parser) peekTokensAre(ts ...token.TokenType) bool {
+	for _, t := range ts {
+		if p.peekToken.Type == t {
+			return true
+		}
+	}
+	return false
 }
 
 func (p *Parser) expectPeek(t token.TokenType) bool {
