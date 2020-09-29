@@ -13,6 +13,7 @@ type Emp struct {
 	Mgr sql.NullInt64 `db:"MGR"` // type: NUMBER
 	Hiredate sql.NullTime `db:"HIREDATE"` // type: DATE
 	Hiredaten time.Time `db:"HIREDATEN"` // type: DATE
+	Todate time.Time `db:"TODATE"` // type: DATE
 	Sal sql.NullInt64 `db:"SAL"` // type: NUMBER
 	Comm sql.NullInt64 `db:"COMM"` // type: NUMBER
 	Deptno sql.NullInt64 `db:"DEPTNO"` // type: NUMBER

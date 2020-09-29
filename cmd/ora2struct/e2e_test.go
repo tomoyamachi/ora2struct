@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"io/ioutil"
 	"testing"
 
@@ -26,7 +25,6 @@ func TestE2E(t *testing.T) {
 		}
 
 		var buf bytes.Buffer
-		fmt.Println(len(nodes))
 		if err = generator.Output(&buf, nodes, "models", ""); err != nil {
 			t.Errorf("unsupported error: %s", err)
 			continue
@@ -37,8 +35,6 @@ func TestE2E(t *testing.T) {
 			t.Errorf("unsupported error: %s", err)
 			continue
 		}
-
-		fmt.Println(buf)
 		if buf.String() != string(want) {
 			t.Errorf("expected %s, but %s", string(want), buf.String())
 		}
