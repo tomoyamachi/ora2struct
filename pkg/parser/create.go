@@ -57,9 +57,21 @@ func (p *Parser) parseViewColumns() []*ast.ColumnDef {
 			if p.curTokenIs(token.COMMA) {
 				break
 			}
+			if p.curTokenIs(token.LPAREN) {
+				p.skipToRParen()
+			}
 			if p.curTokensAre(token.RPAREN, token.EOF) {
 				return columns
 			}
+		}
+	}
+}
+
+func (p *Parser) skipToRParen() {
+	for {
+		p.nextToken()
+		if p.curTokenIs(token.RPAREN) {
+			return
 		}
 	}
 }
@@ -125,13 +137,7 @@ func (p *Parser) parseTableColumns() []*ast.ColumnDef {
 
 		// some columns need bracket options, like VARCHAR2(30)
 		if p.peekTokenIs(token.LPAREN) {
-			for {
-				p.nextToken()
-				if p.peekTokenIs(token.RPAREN) {
-					p.nextToken()
-					break
-				}
-			}
+			p.skipToRParen()
 		}
 
 		col.Options = p.parseColumnOpts()
@@ -151,6 +157,9 @@ func (p *Parser) parseTableColumns() []*ast.ColumnDef {
 func (p *Parser) parseColumnOpts() []*ast.ColumnOption {
 	opts := []*ast.ColumnOption{}
 	for {
+		if p.peekTokenIs(token.LPAREN) {
+			p.skipToRParen()
+		}
 		if p.peekTokenIs(token.COMMA) || p.peekTokenIs(token.RPAREN) {
 			return opts
 		}
