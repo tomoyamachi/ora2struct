@@ -1,6 +1,9 @@
 package parser
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/tomoyamachi/ora2struct/pkg/ast"
 	"github.com/tomoyamachi/ora2struct/pkg/token"
 )
@@ -137,6 +140,14 @@ func (p *Parser) parseTableColumns() []*ast.ColumnDef {
 
 		// some columns need bracket options, like VARCHAR2(30)
 		if p.peekTokenIs(token.LPAREN) {
+			// if number checks paren value
+			if col.Type.Type == token.NUMBER {
+				if i, err := p.parseNumberScale(); err != nil {
+					p.errors = append(p.errors, fmt.Sprintf("parse NUMBER scale column: %s, err: %s", cName, err))
+				} else if i > 0 {
+					col.Type = token.Token{token.FLOAT, token.FLOAT}
+				}
+			}
 			p.skipToRParen()
 		}
 
@@ -152,6 +163,20 @@ func (p *Parser) parseTableColumns() []*ast.ColumnDef {
 		}
 	}
 	return columns
+}
+
+func (p *Parser) parseNumberScale() (int64, error) {
+	p.nextToken() // move to LPAREN
+	p.nextToken() // move to precision
+	if p.peekTokenIs(token.RPAREN) {
+		return 0, nil
+	}
+
+	if !p.peekTokenIs(token.COMMA) {
+		return 0, fmt.Errorf("expect comma but got %s", p.peekToken.Literal)
+	}
+	p.nextToken()
+	return strconv.ParseInt(p.peekToken.Literal, 10, 64)
 }
 
 func (p *Parser) parseColumnOpts() []*ast.ColumnOption {

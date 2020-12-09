@@ -1,13 +1,14 @@
 -- https://asktom.oracle.com/pls/apex/asktom.search?tag=ddl-export-from-database
 CREATE TABLE "SCOTT"."EMP"
- (    "EMPNO" NUMBER(4,0),
+ (    "EMPNO" NUMBER(4,0) NOT NULL,
       "ENAME" VARCHAR2(10),
       "JOB" VARCHAR2(9),
       "MGR" NUMBER(4,0),
       "HIREDATE" DATE,
       "HIREDATEN" DATE NOT NULL,
       TODATE DATE DEFAULT TO_DATE('99991231','YYYYMMDD') NOT NULL,
-      "SAL" NUMBER(7,2),
+      SAMPLE_FLOAT_NUMBER	NUMBER(4,2)	,
+      "SAL" NUMBER(7,2)  NOT NULL,
       "COMM" NUMBER(7,2),
       "DEPTNO" NUMBER(2,0),
        CONSTRAINT "PK_EMP" PRIMARY KEY ("EMPNO")
