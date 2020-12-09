@@ -7,15 +7,16 @@ import (
 
 // Table SCOTT.EMP
 type Emp struct {
-	Empno sql.NullInt64 `db:"EMPNO"` // type: NUMBER
+	Empno int64 `db:"EMPNO"` // type: NUMBER
 	Ename sql.NullString `db:"ENAME"` // type: VARCHAR2
 	Job sql.NullString `db:"JOB"` // type: VARCHAR2
 	Mgr sql.NullInt64 `db:"MGR"` // type: NUMBER
 	Hiredate sql.NullTime `db:"HIREDATE"` // type: DATE
 	Hiredaten time.Time `db:"HIREDATEN"` // type: DATE
 	Todate time.Time `db:"TODATE"` // type: DATE
-	Sal sql.NullInt64 `db:"SAL"` // type: NUMBER
-	Comm sql.NullInt64 `db:"COMM"` // type: NUMBER
+	SampleFloatNumber sql.NullFloat64 `db:"SAMPLE_FLOAT_NUMBER"` // type: FLOAT
+	Sal float64 `db:"SAL"` // type: FLOAT
+	Comm sql.NullFloat64 `db:"COMM"` // type: FLOAT
 	Deptno sql.NullInt64 `db:"DEPTNO"` // type: NUMBER
 }
 
